@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Sugar",
+    "category": "Sweetener",
+    "used_for": "Provides sweetness.",
+    "safety": "Moderate",
+    "description": "Safe in moderation. Excessive intake may contribute to obesity and diabetes."
+  },
+  {
+    "name": "Salt",
+    "category": "Mineral",
+    "used_for": "Enhances flavor and preserves food.",
+    "safety": "Moderate",
+    "description": "Essential nutrient, but excessive intake can increase blood pressure."
+  },
+  {
+    "name": "Palm Oil",
+    "category": "Vegetable Oil",
+    "used_for": "Improves texture and shelf life.",
+    "safety": "Moderate",
+    "description": "Safe when consumed in moderation. High intake may increase saturated fat consumption."
+  }
+]
