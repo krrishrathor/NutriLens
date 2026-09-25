@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.schemas.scan_schema import ScanRequest
 from app.services.parser_service import extract_ingredients
 from app.services.ingredient_service import find_ingredient
+from app.agents.research_agent import research_ingredient
 
 router = APIRouter()
 
@@ -21,10 +22,15 @@ def scan(request: ScanRequest):
         if details:
             results.append(details)
         else:
-            results.append({
-                "name": ingredient,
-                "found": False
-            })
+            research_response = research_ingredient(ingredient)
+            if research_response.get("success"):
+                results.append(research_response["research"])
+            else:
+                results.append({
+                    "name": ingredient,
+                    "found": False,
+                    "error": research_response.get("message")
+                })
 
     return {
         "success": True,
