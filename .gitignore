@@ -27,3 +27,6 @@ coverage/
 
 # Generated files
 *.log
+
+# # Backup files
+# *.backup

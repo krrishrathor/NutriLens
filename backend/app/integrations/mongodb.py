@@ -1,13 +1,14 @@
 import certifi
 from pymongo import MongoClient
-# from pymongo.server_api import ServerApi
+from pymongo.server_api import ServerApi
 
 from app.config import MONGODB_URI, DATABASE_NAME
 
-# server_api = ServerApi("1") 
+server_api = ServerApi("1") 
 
 client = MongoClient(
     MONGODB_URI,
+    server_api=server_api,
     tls=True,
     tlsCAFile=certifi.where(),
     serverSelectionTimeoutMS=10000
