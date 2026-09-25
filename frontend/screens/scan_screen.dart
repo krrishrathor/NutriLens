@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../services/camera_service.dart';
 import '../services/mlkit_service.dart';
+import '../services/api_service.dart';
+import 'result_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({Key? key}) : super(key: key);
@@ -13,15 +15,18 @@ class ScanScreen extends StatefulWidget {
 class _ScanScreenState extends State<ScanScreen> {
   final CameraService _cameraService = CameraService();
   final MLKitService _mlkitService = MLKitService();
+  final ApiService _apiService = ApiService();
 
   String? _imagePath;
   String _extractedText = '';
   bool _isProcessing = false;
+  String? _errorMessage;
 
   Future<void> _captureAndProcess() async {
     setState(() {
       _isProcessing = true;
       _extractedText = '';
+      _errorMessage = null;
     });
 
     try {
@@ -36,17 +41,35 @@ class _ScanScreenState extends State<ScanScreen> {
         setState(() {
           _extractedText = text;
         });
-        
-        // In Phase 4, we will send this text to the backend.
+
+        if (text.trim().isEmpty) {
+          setState(() {
+            _errorMessage = 'Could not extract text from the image. Please try again.';
+          });
+          return;
+        }
+
+        final analysisResult = await _apiService.analyzeIngredients(text);
+
+        if (!mounted) return;
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultScreen(response: analysisResult),
+          ),
+        );
       }
     } catch (e) {
       setState(() {
-        _extractedText = 'Error: $e';
+        _errorMessage = 'Error: \$e';
       });
     } finally {
-      setState(() {
-        _isProcessing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 
@@ -83,11 +106,20 @@ class _ScanScreenState extends State<ScanScreen> {
               const SizedBox(height: 20),
               if (_isProcessing)
                 const Center(child: CircularProgressIndicator())
+              else if (_errorMessage != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  color: Colors.red[50],
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                )
               else if (_extractedText.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),
                   color: Colors.blue[50],
-                  child: Text(_extractedText),
+                  child: Text('Extracted: \$_extractedText'),
                 ),
             ],
           ),
